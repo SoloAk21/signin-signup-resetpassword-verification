@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import InputField from "../components/InputField";
+import InputField from "../components/form/InputField";
 import Alert from "../components/Alert";
 import { FaSpinner } from "react-icons/fa";
 
@@ -51,6 +51,7 @@ const ForgotPassword = () => {
             <InputField
               label="Email"
               type="email"
+              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />

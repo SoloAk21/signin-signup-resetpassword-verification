@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate
-import InputField from "../components/InputField";
+import InputField from "../components/form/InputField";
 import Alert from "../components/Alert";
 import { FaSpinner } from "react-icons/fa";
 import { validatePassword } from "../form/validate";

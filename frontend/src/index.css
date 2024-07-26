@@ -1,3 +1,110 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Define dark and light mode colors */
+:root {
+  --bg-color-light: #ffffff;
+  --text-color-light: #424242;
+  --text-color-desc-light: #757575;
+
+  --bg-color-dark: #1e1e1e;
+  --text-color-dark: #f3f4f6;
+  --primary-light: #4f46e5;
+  --primary-dark: #4f46e5;
+  --border-light: #aaaaaa;
+  --border-dark: #121212;
+  --card-bg-color-light: #f5f5f5;
+  --card-bg-color-dark: #2d2d2d;
+  --input-bg-color-light: #ffffff;
+  --input-bg-color-dark: #313131;
+
+  --input-border-color-light: #2d3748;
+  --input-border-color-dark: #ffffff;
+
+  --bg-btn-color-light: #2d3748;
+  --bg-btn-color-dark: #ffffff;
+}
+
+[data-theme="light"] {
+  --bg-color: var(--bg-color-light);
+  --bg-btn-color: var(--bg-btn-color-light);
+  --text-color: var(--text-color-light);
+  --primary: var(--primary-light);
+  --border: var(--border-light);
+  --card-bg-color: var(--card-bg-color-light);
+  --input-bg-color: var(--input-bg-color-light);
+  --input-border-color: var(--input-border-color-light);
+}
+
+[data-theme="dark"] {
+  --bg-color: var(--bg-color-dark);
+  --bg-btn-color: var(--bg-btn-color-dark);
+  --text-color: var(--text-color-dark);
+  --primary: var(--primary-dark);
+  --border: var(--border-dark);
+  --card-bg-color: var(--card-bg-color-dark);
+  --input-bg-color: var(--input-bg-color-dark);
+  --input-border-color: var(--input-border-color-dark);
+}
+
+/* Add dynamic colors for select field */
+.select-field {
+  background-color: var(--input-bg-color);
+  border-color: var(--input-border-color);
+  color: var(--text-color);
+}
+
+.select-field-button {
+  background-color: var(--input-bg-color);
+  border-color: var(--input-border-color);
+  color: var(--text-color);
+}
+
+.select-field-option {
+  background-color: var(--card-bg-color);
+  color: var(--text-color);
+}
+
+.select-field-option:hover {
+  background-color: var(--primary);
+  color: var(--bg-color);
+}
+
+/* Hide the default checkbox */
+.checkbox {
+  display: none;
+}
+
+/* Style the switch container */
+.toggle-label {
+  background-color: #e5e7eb; /* Light gray background */
+  transition: background-color 0.3s ease;
+}
+
+/* Style the knob inside the switch */
+.toggle-knob {
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  transform: translateX(0); /* Move to the left when unchecked */
+}
+
+/* Change switch and knob colors when checked */
+.checkbox:checked + .toggle-label {
+  background-color: #4f46e5; /* Green background when checked */
+}
+
+.checkbox:checked + .toggle-label .toggle-knob {
+  transform: translateX(100%); /* Move to the right when checked */
+  background-color: #ffffff; /* White color for knob */
+}

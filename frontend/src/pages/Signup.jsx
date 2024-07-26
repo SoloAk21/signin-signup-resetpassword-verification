@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import {
   validateName,
@@ -6,73 +6,74 @@ import {
   validatePassword,
 } from "../form/validate";
 import Alert from "../components/Alert";
-import InputField from "../components/InputField";
+import InputField from "../components/form/InputField";
+
 import GoogleAuthButton from "../components/GoogleAuthButton";
 import { FaSpinner } from "react-icons/fa";
-const Signup = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
-  const [nameError, setNameError] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+const Signup = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState({ type: "", content: "" });
+  const [loading, setLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const validateForm = () => {
+    const { name, email, password, userType } = formData;
+    return {
+      name: validateName(name),
+      email: validateEmail(email),
+      password: validatePassword(password),
+    };
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
-    setSuccessMessage("");
+    setErrors({});
+    setMessage({ type: "", content: "" });
 
-    const nameValidationError = validateName(name);
-    const emailValidationError = validateEmail(email);
-    const passwordValidationError = validatePassword(password);
-
-    if (
-      nameValidationError ||
-      emailValidationError ||
-      passwordValidationError
-    ) {
-      setNameError(nameValidationError);
-      setEmailError(emailValidationError);
-      setPasswordError(passwordValidationError);
+    const validationErrors = validateForm();
+    if (Object.values(validationErrors).some((err) => err)) {
+      setErrors(validationErrors);
       setLoading(false);
       return;
     }
 
     try {
-      const response = await axios.post("/api/auth/signup", {
-        name,
-        email,
-        password,
+      const { data } = await axios.post("/api/auth/signup", formData);
+      setMessage({
+        type: "success",
+        content: "Signup successful. Please check your email for verification.",
       });
-      setSuccessMessage(
-        "Signup successful. Please check your email for verification."
-      );
     } catch (error) {
-      console.log(error);
-      setError(
-        error.response ? error.response.data.message : "Error during signup."
-      );
+      setMessage({
+        type: "error",
+        content: error.response?.data.message || "Error during signup.",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  // Clear alert after 3 seconds
   useEffect(() => {
-    if (error || successMessage) {
-      const timer = setTimeout(() => {
-        setError("");
-        setSuccessMessage("");
-      }, 3000);
+    if (message.content) {
+      const timer = setTimeout(
+        () => setMessage({ type: "", content: "" }),
+        3000
+      );
       return () => clearTimeout(timer);
     }
-  }, [error, successMessage]);
+  }, [message.content]);
 
   const handleGoogleAuthClick = () => {
     setIsGoogleLoading(true);
@@ -81,11 +82,8 @@ const Signup = () => {
 
   return (
     <>
-      {(error || successMessage) && (
-        <Alert
-          message={error || successMessage}
-          type={successMessage ? "success" : "error"}
-        />
+      {message.content && (
+        <Alert message={message.content} type={message.type} />
       )}
       <div className="flex items-center p-4 justify-center min-h-screen bg-gray-100">
         <div className="bg-white p-8 rounded-lg shadow-lg w-full md:w-96">
@@ -93,28 +91,35 @@ const Signup = () => {
           <form onSubmit={handleSubmit}>
             <InputField
               label="Name"
+              name="name"
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              error={nameError}
+              value={formData.name}
+              onChange={handleChange}
+              error={errors.name}
+              placeholder="Enter your full name"
             />
             <InputField
               label="Email"
+              name="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              error={emailError}
+              value={formData.email}
+              onChange={handleChange}
+              error={errors.email}
+              placeholder="Enter your email address"
             />
             <InputField
               label="Password"
+              name="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              error={passwordError}
+              value={formData.password}
+              onChange={handleChange}
+              error={errors.password}
+              placeholder="Enter a secure password"
             />
+
             <button
               type="submit"
-              className="w-full bg-blue-500 text-white px-4 py-2 rounded flex items-center justify-center"
+              className="w-full bg-blue-500 text-white px-4 py-2 rounded flex items-center justify-center mt-4"
               disabled={loading}
             >
               {loading ? (

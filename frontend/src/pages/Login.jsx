@@ -3,30 +3,36 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import InputField from "../components/InputField";
-import Alert from "../components/Alert";
+import InputField from "../components/form/InputField";
 import GoogleAuthButton from "../components/GoogleAuthButton";
 import { FaSpinner } from "react-icons/fa";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setEmailError("");
+    setPasswordError("");
     setIsLoading(true);
-    setSuccessMessage("");
     try {
       const response = await axios.post("/api/auth/login", { email, password });
       localStorage.setItem("token", response.data.token);
-      setSuccessMessage("Login successful.");
+      // Handle successful login (e.g., redirect)
     } catch (error) {
-      setError("Invalid credentials or email not verified.");
+      if (error.response?.data?.errors) {
+        const { email: emailErr, password: passwordErr } =
+          error.response.data.errors;
+        setEmailError(emailErr || "");
+        setPasswordError(passwordErr || "");
+      } else {
+        setEmailError("Invalid credentials or email not verified.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -37,27 +43,10 @@ const Login = () => {
     window.location.href = "/api/auth/google";
   };
 
-  // Clear alert after 3 seconds
-  useEffect(() => {
-    if (error || successMessage) {
-      const timer = setTimeout(() => {
-        setError("");
-        setSuccessMessage("");
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [error, successMessage]);
-
   return (
-    <>
-      {(error || successMessage) && (
-        <Alert
-          message={error || successMessage}
-          type={successMessage ? "success" : "error"}
-        />
-      )}
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="bg-white p-8 rounded-lg shadow-lg w-80">
+    <div className="flex items-center justify-center min-h-screen bg-gray-200">
+      <div className="cursor-pointer rounded-md shadow-lg bg-white dark:bg-gray-800 relative w-80">
+        <div className="p-8">
           <h2 className="text-2xl font-bold mb-4">Login</h2>
           <form onSubmit={handleSubmit}>
             <InputField
@@ -65,16 +54,20 @@ const Login = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email address"
+              error={emailError}
             />
             <InputField
               label="Password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              error={passwordError}
             />
             <button
               type="submit"
-              className="w-full bg-blue-500 text-white px-4 py-2 rounded flex items-center justify-center"
+              className="w-full bg-blue-500 text-white px-4 py-2 rounded flex items-center justify-center mt-4"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -94,13 +87,16 @@ const Login = () => {
             onClick={handleGoogleAuthClick}
           />
           <div className="mt-4 text-center">
-            <Link to="/forgot-password" className="text-blue-500">
+            <Link
+              to="/forgot-password"
+              className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+            >
               Forgot Password?
             </Link>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

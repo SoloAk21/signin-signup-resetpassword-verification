@@ -36,6 +36,7 @@ const errorHandler = (statusCode, message) => {
 router.post("/signup", async (req, res, next) => {
   try {
     const { email, password, name } = req.body;
+    console.log(req.body);
     // Check if email is already registered
     let user = await User.findOne({ email });
     if (user) {
